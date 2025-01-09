@@ -1,0 +1,191 @@
+/* No comment provided by engineer. */
+"%@ exited with code %d" = "%@ 意外退出，返回值 %d";
+
+/* No comment provided by engineer. */
+"%@ terminated with signal %d" = "%@ 意外终止，未捕获的信号 %d";
+
+/* No comment provided by engineer. */
+"Advanced Settings" = "高级选项";
+
+/* No comment provided by engineer. */
+"And %d more unsupported user applications." = "另有 %d 个不支持的用户应用";
+
+/* No comment provided by engineer. */
+"Completed" = "已完成";
+
+/* No comment provided by engineer. */
+"Copyright" = "版权所有";
+
+/* No comment provided by engineer. */
+"Done" = "完成";
+
+/* No comment provided by engineer. */
+"Eject" = "推出";
+
+/* No comment provided by engineer. */
+"Eject All" = "全部推出";
+
+/* No comment provided by engineer. */
+"Error" = "错误";
+
+/* No comment provided by engineer. */
+"Failed" = "失败";
+
+/* No comment provided by engineer. */
+"Failed to find entry CFBundleExecutable in: %@" = "找不到 %@ 中的 CFBundleExecutable。";
+
+/* No comment provided by engineer. */
+"Failed to locate main executable: %@" = "找不到主要可执行文件：%@";
+
+/* No comment provided by engineer. */
+"Failed to parse: %@" = "无法解析：%@";
+
+/* No comment provided by engineer. */
+"Filza (URL Scheme) Not Installed" = "未安装支持 URL Scheme 的 Filza";
+
+/* No comment provided by engineer. */
+"If you do not know what these options mean, please do not change them." = "如果你不知道这些选项的含义，请不要更改。";
+
+/* No comment provided by engineer. */
+"Inject" = "注入";
+
+/* No comment provided by engineer. */
+"Injectable System Applications" = "可注入的系统应用";
+
+/* No comment provided by engineer. */
+"Injected Plug-Ins" = "已注入的插件";
+
+/* No comment provided by engineer. */
+"Injecting" = "注入中";
+
+/* No comment provided by engineer. */
+"Injection" = "注入";
+
+/* No comment provided by engineer. */
+"Launch" = "启动";
+
+/* No comment provided by engineer. */
+"Lock Version" = "锁定版本";
+
+/* No comment provided by engineer. */
+"Made with ♥ by OwnGoal Studio" = "「乌龙工作室」倾情献制";
+
+/* No comment provided by engineer. */
+"No eligible framework found." = "没有找到符合条件的框架。";
+
+/* No comment provided by engineer. */
+"No eligible framework found.\n\nIt is usually not a bug with TrollFools itself, but rather with the target app. You may re-install that from App Store. You can’t use TrollFools with apps installed via “Asspp” or tweaks like “NoAppThinning”." = "没有找到符合条件的框架。\n\n通常情况下，这不是 TrollFools 自身的问题，而是目标应用程序的问题。你可能需要从 App Store 重新安装该应用。你不能在通过 “爱啪思道” 或 “NoAppThinning” 等方式安装的应用程序上使用 TrollFools。";
+
+/* No comment provided by engineer. */
+"No Injected Plug-Ins" = "没有已注入的插件";
+
+/* No comment provided by engineer. */
+"No valid plug-ins found." = "没有找到有效的插件。";
+
+/* No comment provided by engineer. */
+"Only removable system applications are eligible and listed." = "仅列出可移除的系统应用，其他系统应用不支持注入。";
+
+/* No comment provided by engineer. */
+"Patched" = "已注入";
+
+/* No comment provided by engineer. */
+"Pinned Version" = "已固定版本";
+
+/* No comment provided by engineer. */
+"Plug-Ins" = "插件列表";
+
+/* No comment provided by engineer. */
+"Prefer Main Executable" = "优先处理主要可执行文件";
+
+/* No comment provided by engineer. */
+"Rebuild Icon Cache" = "重建图标缓存";
+
+/* No comment provided by engineer. */
+"Search Patched…" = "搜索 已注入…";
+
+/* No comment provided by engineer. */
+"Search…" = "搜索…";
+
+/* No comment provided by engineer. */
+"Select Application to Inject" = "选择应用程序进行注入";
+
+/* No comment provided by engineer. */
+"Show in Filza" = "在 Filza 中显示";
+
+/* No comment provided by engineer. */
+"Show Patched Only" = "仅显示已注入的";
+
+/* No comment provided by engineer. */
+"Some plug-ins were not injected by TrollFools, please eject them with caution." = "部分插件可能并非由 TrollFools 注入，移除它们可能会造成应用程序异常，请谨慎操作。";
+
+/* No comment provided by engineer. */
+"Source Code" = "获取源代码";
+
+/* No comment provided by engineer. */
+"TrollFools" = "TrollFools";
+
+/* No comment provided by engineer. */
+"TrollStore Applications" = "巨魔商店应用";
+
+/* No comment provided by engineer. */
+"Unlock Version" = "解锁版本";
+
+/* No comment provided by engineer. */
+"Use Weak Reference" = "创建弱引用";
+
+/* No comment provided by engineer. */
+"User Applications" = "用户应用";
+
+/* No comment provided by engineer. */
+"You need to rebuild the icon cache in TrollStore to apply changes." = "你需要在 TrollStore 中重建图标缓存以应用更改。";
+
+/* No comment provided by engineer. */
+"@huamidev Add some features" = "@huamidev 添加部分功能";
+
+/* No comment provided by engineer. */
+"Name (A-Z)" = "名称 (A-Z)";
+
+/* No comment provided by engineer. */
+"Name (Z-A)" = "名称 (Z-A)";
+
+/* No comment provided by engineer. */
+"Switch to Default Icon" = "切换到默认图标";
+
+/* No comment provided by engineer. */
+"Switch to Official Icon" = "切换到官方图标";
+
+/* No comment provided by engineer. */
+"All" = "全部应用";
+
+/* No comment provided by engineer. */
+"User" = "用户应用";
+
+/* No comment provided by engineer. */
+"Troll" = "巨魔应用";
+
+/* No comment provided by engineer. */
+"System" = "系统应用";
+
+/* No comment provided by engineer. */
+"Notification" = "通知";
+
+/* No comment provided by engineer. */
+"Clear App Cache" = "清除本应用缓存";
+
+/* No comment provided by engineer. */
+"Clear Done" = "清除完成";
+
+/* No comment provided by engineer. */
+"Clear Caches" = "清除缓存";
+
+/* No comment provided by engineer. */
+"This software is an open-source project TrollFools.\nIf you have purchased it, you should understand what this means.\nVisit the project address in the footer for more information.\nModified version by huami.\nChange Lessica to huami1314 to redirect to this project.\nTG: @huamidev\nThis popup will only display once.\nThanks to the original author i_82." = "本软件为开源项目TrollFools。\n如果你是购买的 你应该明白这意味着什么。\n请访问底部中的版权以获取更多信息。\n由huami修改的版本。\n将Lessica更改为huami1314即可重定向到本项目。\nTG:@huamidev\n此弹窗只会显示一次。\n感谢原作者i_82。";
+
+/* No comment provided by engineer. */
+"Un support." = "不支持该应用。";
+
+/* No comment provided by engineer. */
+"Cancel" = "取消";
+
+/* No comment provided by engineer. */
+"%d applications are not supported." = "%d 个应用程序不被支持";

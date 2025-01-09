@@ -1,0 +1,2 @@
+- Added some explanation about the “No eligible framework found” error.
+- Patch MachOKit to avoid potential crashes when parsing certain Mach-O files.

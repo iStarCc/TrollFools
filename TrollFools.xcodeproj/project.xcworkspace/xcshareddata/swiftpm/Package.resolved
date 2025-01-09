@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "machokit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Lessica/MachOKit.git",
+      "state" : {
+        "branch" : "patch/trollfools",
+        "revision" : "43c4b5d59ab75c91ad689fb4a39a8a3913229535"
+      }
+    },
+    {
+      "identity" : "zipfoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/weichsel/ZIPFoundation.git",
+      "state" : {
+        "revision" : "02b6abe5f6eef7e3cbd5f247c5cc24e246efcfe0",
+        "version" : "0.9.19"
+      }
+    }
+  ],
+  "version" : 2
+}
