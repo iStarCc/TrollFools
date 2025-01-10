@@ -197,7 +197,10 @@ struct AppListView: View {
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    appList.filter.showPatchedOnly.toggle()
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        appList.filter.showPatchedOnly.toggle()
+                        appList.performFilter()
+                    }
                 } label: {
                     if #available(iOS 15.0, *) {
                         Image(systemName: appList.filter.showPatchedOnly 
