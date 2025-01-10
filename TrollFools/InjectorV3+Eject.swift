@@ -5,7 +5,6 @@
 //  Created by 82Flex on 2025/1/10.
 //
 
-import CocoaLumberjackSwift
 
 extension InjectorV3 {
 
@@ -52,7 +51,7 @@ extension InjectorV3 {
             throw Error.generic(NSLocalizedString("No eligible framework found.", comment: ""))
         }
 
-        DDLogInfo("modified Mach-Os \(targetURLs.map { $0.path })")
+        NSLog("modified Mach-Os \(targetURLs.map { $0.path })")
 
         for assetURL in assetURLs {
             try targetURLs.forEach {

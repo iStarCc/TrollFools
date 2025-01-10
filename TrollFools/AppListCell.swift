@@ -56,7 +56,7 @@ struct AppListCell: View {
                 Button {
                     do {
                         let injector = try Injector(app.url, appID: app.id, teamID: app.teamID)
-                        try injector.setDetached(false)
+                        try InjectorV3(app.url).setMetadataDetached(false)
                         withAnimation {
                             app.reload()
                             appList.isRebuildNeeded = true
@@ -69,7 +69,7 @@ struct AppListCell: View {
                 Button {
                     do {
                         let injector = try Injector(app.url, appID: app.id, teamID: app.teamID)
-                        try injector.setDetached(true)
+                        try InjectorV3(app.url).setMetadataDetached(true)
                         withAnimation {
                             app.reload()
                             appList.isRebuildNeeded = true
@@ -199,7 +199,7 @@ struct AppListCell: View {
     }
     private func clearAppCache() {
         do {
-            let injector = try Injector(app.url, appID: app.id, teamID: app.teamID)
+            let injector = try InjectorV3(app.url)
             
             let cachePaths = [
                 URL(fileURLWithPath: app.dataurl.path.replacingOccurrences(of: "/private/", with: "")).appendingPathComponent("Library/Caches"),
@@ -208,7 +208,7 @@ struct AppListCell: View {
             
             for path in cachePaths {
                 // NSLog("[AppCache] 正在清理路径: \(path.path)")
-                try injector.removeURL(path, isDirectory: true)
+                try injector.cmdRemove(path, recursively: true)
             }
             
             // NSLog("[AppCache] 应用缓存清理完成")

@@ -859,7 +859,7 @@ final class Injector {
             log("Command Output: \(receipt.stdout)")
             log("Standard Error: \(receipt.stderr)")
             log("Decompose Deb File \(sourceURL.lastPathComponent) done")
-//            DDLogInfo("Decompose Deb File \(sourceURL.lastPathComponent) done")
+//            NSLog("Decompose Deb File \(sourceURL.lastPathComponent) done")
             
             return receipt.stdout
         } catch {

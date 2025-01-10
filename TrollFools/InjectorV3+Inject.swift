@@ -5,7 +5,6 @@
 //  Created by 82Flex on 2025/1/10.
 //
 
-import CocoaLumberjackSwift
 
 extension InjectorV3 {
 
@@ -54,7 +53,7 @@ extension InjectorV3 {
             throw Error.generic(NSLocalizedString("No eligible framework found.\n\nIt is usually not a bug with TrollFools itself, but rather with the target app. You may re-install that from App Store. You can’t use TrollFools with apps installed via “Asspp” or tweaks like “NoAppThinning”.", comment: ""))
         }
 
-        DDLogInfo("best matched Mach-O \(targetMachO.path)")
+        NSLog("best matched Mach-O \(targetMachO.path)")
 
         try makeAlternate(targetMachO)
         do {
