@@ -195,36 +195,19 @@ struct AppListView: View {
                 }
                 .accessibilityLabel(NSLocalizedString("Sort Order", comment: ""))
             }
-            
-            ToolbarItem(placement: .navigationBarTrailing) {
-                if #available(iOS 15.0, *) {
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            appList.filter.showPatchedOnly.toggle()
-                            appList.performFilter()
-                        }
-                    } label: {
-                        Image(systemName: appList.filter.showPatchedOnly
-                              ? "line.3.horizontal.decrease.circle.fill"
-                              : "line.3.horizontal.decrease.circle")
-                    }
-                    .accessibilityLabel(NSLocalizedString("Show Patched Only", comment: ""))
-                } else {
-                    // iOS 14 的 "Show Patched Only" 按钮
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            appList.filter.showPatchedOnly.toggle()
-                            appList.performFilter()
-                        }
-                    } label: {
-                        Image(systemName: appList.filter.showPatchedOnly
-                              ? "line.3.horizontal.decrease.circle.fill"
-                              : "line.3.horizontal.decrease.circle")
-                    }
-                    .accessibilityLabel(NSLocalizedString("Show Patched Only", comment: ""))
-                }
-            }
         }
+        .navigationBarItems(trailing: 
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    appList.filter.showPatchedOnly.toggle()
+                    appList.performFilter()
+                }
+            }) {
+                Image(systemName: appList.filter.showPatchedOnly
+                    ? "line.3.horizontal.decrease.circle.fill"
+                    : "line.3.horizontal.decrease.circle")
+            }
+        )
     }
 
     var body: some View {
