@@ -195,19 +195,21 @@ struct AppListView: View {
                 }
                 .accessibilityLabel(NSLocalizedString("Sort Order", comment: ""))
             }
-        }
-        .navigationBarItems(trailing: 
-            Button(action: {
-                withAnimation(.easeInOut(duration: 0.3)) {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
                     appList.filter.showPatchedOnly.toggle()
-                    appList.performFilter()
+                } label: {
+                    if #available(iOS 15.0, *) {
+                        Image(systemName: appList.filter.showPatchedOnly 
+                              ? "line.3.horizontal.decrease.circle.fill"
+                              : "line.3.horizontal.decrease.circle")
+                    } else {
+                        Image(systemName: "slider.horizontal.3")
+                    }
                 }
-            }) {
-                Image(systemName: appList.filter.showPatchedOnly
-                    ? "line.3.horizontal.decrease.circle.fill"
-                    : "line.3.horizontal.decrease.circle")
+                .accessibilityLabel(NSLocalizedString("Show Patched Only", comment: ""))
             }
-        )
+        }
     }
 
     var body: some View {
