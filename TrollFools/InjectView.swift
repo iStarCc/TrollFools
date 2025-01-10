@@ -30,6 +30,7 @@ struct InjectView: View {
             if injector.teamID.isEmpty {
                 injector.teamID = app.teamID
             }
+            try injector.inject(urlList)
             return .success(())
         } catch {
             NSLog("\(error)")
