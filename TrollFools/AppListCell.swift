@@ -79,6 +79,13 @@ struct AppListCell: View {
                     Label(NSLocalizedString("Lock Version", comment: ""), systemImage: "lock")
                 }
             }
+            
+            // 添加清除应用缓存按钮
+            Button {
+                clearAppCache()
+            } label: {
+                Label(NSLocalizedString("Clear App Cache", comment: ""), systemImage: "trash")
+            }
         }
     }
 
@@ -189,5 +196,24 @@ struct AppListCell: View {
 
     private func openInFilza() {
         appList.openInFilza(app.url)
+    }
+    private func clearAppCache() {
+        do {
+            let injector = try Injector(app.url, appID: app.id, teamID: app.teamID)
+            
+            let cachePaths = [
+                URL(fileURLWithPath: app.dataurl.path.replacingOccurrences(of: "/private/", with: "")).appendingPathComponent("Library/Caches"),
+                URL(fileURLWithPath: app.dataurl.path.replacingOccurrences(of: "/private/", with: "")).appendingPathComponent("tmp")
+            ]
+            
+            for path in cachePaths {
+                // NSLog("[AppCache] 正在清理路径: \(path.path)")
+                try injector.removeURL(path, isDirectory: true)
+            }
+            
+            // NSLog("[AppCache] 应用缓存清理完成")
+        } catch {
+            // NSLog("[AppCache] 清理缓存失败: \(error.localizedDescription)")
+        }
     }
 }

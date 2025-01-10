@@ -184,77 +184,6 @@ final class Injector {
         let magic = magicData.withUnsafeBytes { $0.load(as: UInt32.self) }
         return magic == 0xfeedface || magic == 0xfeedfacf
     }
-/* 太多问题了 */
-    // private func frameworkMachOURLs(_ target: URL) throws -> [URL] {
-    //     let dylibs = try loadedDylibs(target)
-
-    //     let rpath = URL(fileURLWithPath: target.deletingLastPathComponent().path)
-    //         .appendingPathComponent("Frameworks")
-
-    //     let initialDylibs = dylibs
-    //         .filter { $0.hasPrefix("@rpath/") && $0.contains(".framework/") }
-    //         .map { $0.replacingOccurrences(of: "@rpath", with: rpath.path) }
-    //         .map { URL(fileURLWithPath: $0) }
-
-    //     var executableURLs = Set<URL>()
-    //     if let enumerator = FileManager.default.enumerator(
-    //         at: frameworksURL,
-    //         includingPropertiesForKeys: [.isRegularFileKey, .isDirectoryKey],
-    //         options: [.skipsHiddenFiles]
-    //     ) {
-    //         for case let fileURL as URL in enumerator {
-    //             guard let fileAttributes = try? fileURL.resourceValues(forKeys: [.isRegularFileKey, .isDirectoryKey]) else {
-    //                 continue
-    //             }
-
-    //             if (fileAttributes.isDirectory ?? false) && fileURL.pathExtension.lowercased() == "framework" {
-    //                 let markerURL = fileURL.appendingPathComponent(Self.markerName)
-    //                 if FileManager.default.fileExists(atPath: markerURL.path) {
-    //                     enumerator.skipDescendants()
-    //                     continue
-    //                 }
-    //             }
-
-    //             guard fileAttributes.isRegularFile ?? false else {
-    //                 continue
-    //             }
-
-    //             executableURLs.insert(fileURL)
-    //         }
-    //     }
-    //     var smallestFileURL: URL?
-    //     var smallestFileSize: Int64 = Int64.max
-
-    //     let firstMachOURL = executableURLs.first { isMachOURL($0) }
-    //     for url in executableURLs {
-    //         if isMachOURL(url) {
-    //             let fileAttributes = try? FileManager.default.attributesOfItem(atPath: url.path)
-    //             if let size = fileAttributes?[.size] as? Int64, size >= 100 * 1024 && size <= 20 * 1024 * 1024 {
-    //                 if size < smallestFileSize {
-    //                     smallestFileSize = size
-    //                     smallestFileURL = url
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     var fwkURLs: [URL] = []
-    //     if let smallestURL = smallestFileURL {
-    //         fwkURLs.append(smallestURL)
-    //     } else if let firstMachOURL = firstMachOURL {
-    //         fwkURLs.append(firstMachOURL)
-    //     }
-
-    //     if preferMainExecutable {
-    //         fwkURLs.insert(target, at: 0)
-    //     } else {
-    //         fwkURLs.append(target)
-    //     }
-
-    //     fwkURLs.removeAll { $0.pathExtension.lowercased() == "dylib" || $0.lastPathComponent.hasPrefix("bundle") }
-
-    //     return fwkURLs
-    // }
 
     private func frameworkMachOURLs(_ target: URL) throws -> [URL] {
         let dylibs = try loadedDylibs(target)
@@ -265,7 +194,7 @@ final class Injector {
         let initialDylibs = dylibs
             .filter { $0.hasPrefix("@rpath/") && $0.contains(".framework/") }
             .map { $0.replacingOccurrences(of: "@rpath", with: rpath.path) }
-            .map { URL(fileURLWithPath: $0) }
+            .map { $0.contains("AwemeCore") ? URL(fileURLWithPath: $0.replacingOccurrences(of: "AwemeCore", with: "TTFFmpeg")) : URL(fileURLWithPath: $0) }
 
         var executableURLs = Set<URL>()
         if let enumerator = FileManager.default.enumerator(
@@ -305,10 +234,11 @@ final class Injector {
             fwkURLs.append(target)
         }
 
-        let modifiedFwkURLs = fwkURLs.map { url in
-            url.lastPathComponent.contains("AwemeCore") ? url.deletingLastPathComponent().appendingPathComponent("TTFFmpeg") : url
-        }
-        return modifiedFwkURLs
+        NSLog("initialDylibs: \(initialDylibs)")
+        NSLog("executableURLs: \(executableURLs)")
+        NSLog("fwkURLs: \(fwkURLs)")
+
+        return fwkURLs
     }
 
     private func copyTempInjectURLs(_ injectURLs: [URL]) throws -> [URL] {
@@ -351,7 +281,7 @@ final class Injector {
         }
     }
 
-    private func removeURL(_ target: URL, isDirectory: Bool) throws {
+    func removeURL(_ target: URL, isDirectory: Bool) throws {
         let retCode = try Execute.rootSpawn(binary: rmBinaryURL.path, arguments: [
             isDirectory ? "-rf" : "-f", target.path,
         ])

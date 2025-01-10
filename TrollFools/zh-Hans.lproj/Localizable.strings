@@ -170,7 +170,7 @@
 "Notification" = "通知";
 
 /* No comment provided by engineer. */
-"Clear App Cache" = "清除本应用缓存";
+"Clear Temp Cache" = "清除临时缓存";
 
 /* No comment provided by engineer. */
 "Clear Done" = "清除完成";

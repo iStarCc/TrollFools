@@ -188,7 +188,7 @@ struct AppListView: View {
                         Text(isUsingOfficialIcon ? NSLocalizedString("Switch to Default Icon", comment: "") : NSLocalizedString("Switch to Official Icon", comment: ""))
                     }
                     Button(action: clearCache) {
-                        Text(NSLocalizedString("Clear App Cache", comment: ""))
+                        Text(NSLocalizedString("Clear Temp Cache", comment: ""))
                     }
                 } label: {
                     Image(systemName: "arrow.up.arrow.down.circle")
@@ -341,41 +341,25 @@ struct AppListView: View {
     }
 
     private func clearCache() {
-        let fileManager = FileManager.default
-        
-        let tmpURL = fileManager.temporaryDirectory
         do {
-            let tmpContents = try fileManager.contentsOfDirectory(at: tmpURL, includingPropertiesForKeys: nil)
-            for file in tmpContents {
-                try fileManager.removeItem(at: file)
+            let tempDir = try FileManager.default.url(
+                for: .itemReplacementDirectory,
+                in: .userDomainMask,
+                appropriateFor: URL(fileURLWithPath: NSHomeDirectory()),
+                create: true
+            ).deletingLastPathComponent()
+            
+            let fileManager = FileManager.default
+            let contents = try fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil)
+            
+            for url in contents {
+                // NSLog("[SystemCache] 正在清理临时目录: \(url.path)")
+                try? fileManager.removeItem(at: url)
             }
-        } catch {}
-        
-        let inboxURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("Inbox")
-        do {
-            let inboxContents = try fileManager.contentsOfDirectory(at: inboxURL, includingPropertiesForKeys: nil)
-            for file in inboxContents {
-                try fileManager.removeItem(at: file)
-            }
-        } catch {}
-        
-        let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        do {
-            let cacheContents = try fileManager.contentsOfDirectory(at: cachesDirectory, includingPropertiesForKeys: nil)
-            for file in cacheContents {
-                try fileManager.removeItem(at: file)
-            }
-        } catch {}
-        
-        let alertTitle = NSLocalizedString("Notification", comment: "")
-        let alertMessage = NSLocalizedString("Clear Done", comment: "")
-        let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default, handler: nil))
-        
-        DispatchQueue.main.async {
-            if let topController = UIApplication.shared.windows.first?.rootViewController {
-                topController.present(alert, animated: true, completion: nil)
-            }
+            
+            // NSLog("[SystemCache] 系统临时缓存清理完成")
+        } catch {
+            // NSLog("[SystemCache] 清理系统缓存失败: \(error.localizedDescription)")
         }
     }
 
