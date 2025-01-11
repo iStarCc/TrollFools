@@ -66,7 +66,7 @@ extension InjectorV3 {
         var newCollected = collected
         newCollected.append(target)
 
-        let loadedDylibs = try loadedDylibsOfMachO(target).compactMap({ resolveLoadCommand($0) })
+        let loadedDylibs = (try? loadedDylibsOfMachO(target).compactMap({ resolveLoadCommand($0) })) ?? []
         for dylib in loadedDylibs {
             newCollected = try linkedDylibsRecursivelyOfMachO(dylib, collected: newCollected)
         }
@@ -165,6 +165,7 @@ extension InjectorV3 {
         resolvedName = resolvedName
             .replacingOccurrences(of: "@rpath/", with: frameworksDirectoryURL.path + "/")
 
-        return URL(fileURLWithPath: resolvedName)
+        let fileURL = URL(fileURLWithPath: resolvedName)
+        return FileManager.default.fileExists(atPath: fileURL.path) ? fileURL : nil
     }
 }
