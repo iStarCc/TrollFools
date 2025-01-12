@@ -116,9 +116,9 @@ struct EjectListView: View {
         guard !ejectList.filteredPlugIns.isEmpty else { return }
 
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMdd_HHmmss"
+        dateFormatter.dateFormat = "MMdd-HHmmss"
         let timestamp = dateFormatter.string(from: Date())
-        let zipFileName = "\(ejectList.app.name)_Plugins_\(timestamp)"
+        let zipFileName = "\(ejectList.app.name)Plugins_\(timestamp)"
         let zipFileURL = FileManager.default.temporaryDirectory.appendingPathComponent("\(zipFileName).zip")
 
         do {
@@ -126,7 +126,7 @@ struct EjectListView: View {
             let archive = try Archive(url: zipFileURL, accessMode: .create)
 
             for plugin in ejectList.filteredPlugIns {
-                let entryPath = "\(zipFileName)/\(plugin.url.lastPathComponent)"
+                let entryPath = "\(plugin.url.lastPathComponent)"
                 
                 guard fileManager.fileExists(atPath: plugin.url.path) else {
                     NSLog("File not found: \(plugin.url.path)")

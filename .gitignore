@@ -2,7 +2,7 @@
 packages
 devkit
 compile_commands.json
-
+devkit/tipa.sh
 # Created by https://www.toptal.com/developers/gitignore/api/swift,macos,xcode
 # Edit at https://www.toptal.com/developers/gitignore?templates=swift,macos,xcode
 
@@ -14,7 +14,6 @@ compile_commands.json
 
 # Icon must end with two \r
 Icon
-
 
 # Thumbnails
 ._*
