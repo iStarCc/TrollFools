@@ -24,6 +24,8 @@ struct EjectListView: View {
 
     @State private var isExporting = false
     @State private var exportURL: URL?
+    @State private var showingExportDialog = false
+    @State private var zipFileURL: URL?
 
     var deleteAllButtonLabel: some View {
         HStack {
@@ -141,7 +143,7 @@ struct EjectListView: View {
             }
 
             await MainActor.run {
-                shareFile(zipFileURL)
+                showDocumentPicker(for: zipFileURL)
             }
         } catch {
             NSLog("Export error: \(error)")
@@ -152,26 +154,13 @@ struct EjectListView: View {
         }
     }
 
-    private func shareFile(_ fileURL: URL) {
+    func showDocumentPicker(for url: URL) {
         guard let viewController = viewControllerHost.viewController else { return }
         
-        DispatchQueue.main.async {
-            let activityController = UIActivityViewController(activityItems: [fileURL], applicationActivities: nil)
-            
-            if #available(iOS 15.0, *) {
-                activityController.modalPresentationStyle = .pageSheet
-                if let sheet = activityController.sheetPresentationController {
-                    sheet.detents = [.medium()]
-                    sheet.prefersGrabberVisible = true
-                }
-            } else {
-                activityController.modalPresentationStyle = .formSheet
-            }
-            
-            activityController.completionWithItemsHandler = { (activityType, completed, returnedItems, error) in}
-            
-            viewController.present(activityController, animated: true)
-        }
+        let documentPicker = UIDocumentPickerViewController(forExporting: [url])
+        documentPicker.modalPresentationStyle = .formSheet
+        
+        viewController.present(documentPicker, animated: true)
     }
 
     var body: some View {
@@ -284,5 +273,23 @@ struct ShareSheet: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ShareSheet>) {}
+}
+
+struct ZIPDocument: FileDocument {
+    var url: URL
+    
+    static var readableContentTypes: [UTType] { [.zip] }
+    
+    init(url: URL) {
+        self.url = url
+    }
+    
+    init(configuration: ReadConfiguration) throws {
+        url = URL(fileURLWithPath: "")
+    }
+    
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        return try FileWrapper(url: url, options: .immediate)
+    }
 }
 

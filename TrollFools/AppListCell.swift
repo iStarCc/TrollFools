@@ -80,11 +80,15 @@ struct AppListCell: View {
                 }
             }
             
-            // 添加清除应用缓存按钮
             Button {
                 clearAppCache()
             } label: {
                 Label(NSLocalizedString("Clear App Cache", comment: ""), systemImage: "trash")
+            }
+            Button {
+                // clearAppCache()
+            } label: {
+                Label(NSLocalizedString("Use Last Configuration", comment: ""), systemImage: "gear")
             }
         }
     }
