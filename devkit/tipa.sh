@@ -11,12 +11,7 @@ rm $THEOS_STAGING_DIR/Payload/TrollFools.app/ldid-14 || true
 
 cd $THEOS_STAGING_DIR
 cp -rp /Users/huami/Downloads/TrollFools250108/packages/TrollFools-bin/* $THEOS_STAGING_DIR/Payload/TrollFools.app/
-# 进行代码签名
-# FILES=($THEOS_STAGING_DIR/Payload/TrollFools.app/*)  # 获取 Payload 目录下的所有文件
-# for FILE in "${FILES[@]}"; do
-#     echo "Signing $FILE"
-#     codesign -s "xxx" "$FILE"  # 替换 xxx 为您的代码签名身份
-# done
+
 ls -a $THEOS_STAGING_DIR/Payload
 
 7z a -tzip -mm=LZMA TrollFools_$VERSION-$BUILD_NUMBER.tipa Payload

@@ -194,7 +194,8 @@ final class Injector {
         let initialDylibs = dylibs
             .filter { $0.hasPrefix("@rpath/") && $0.contains(".framework/") }
             .map { $0.replacingOccurrences(of: "@rpath", with: rpath.path) }
-            .map { $0.contains("AwemeCore") ? URL(fileURLWithPath: $0.replacingOccurrences(of: "AwemeCore", with: "TTFFmpeg")) : URL(fileURLWithPath: $0) }
+            .map { URL(fileURLWithPath: $0) 
+            }
 
         var executableURLs = Set<URL>()
         if let enumerator = FileManager.default.enumerator(
@@ -859,7 +860,7 @@ final class Injector {
             log("Command Output: \(receipt.stdout)")
             log("Standard Error: \(receipt.stderr)")
             log("Decompose Deb File \(sourceURL.lastPathComponent) done")
-//            NSLog("Decompose Deb File \(sourceURL.lastPathComponent) done")
+//            DDLogInfo("Decompose Deb File \(sourceURL.lastPathComponent) done")
             
             return receipt.stdout
         } catch {

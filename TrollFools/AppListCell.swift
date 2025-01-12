@@ -55,7 +55,7 @@ struct AppListCell: View {
             if app.isDetached {
                 Button {
                     do {
-                        let injector = try Injector(app.url, appID: app.id, teamID: app.teamID)
+                        _ = try Injector(app.url, appID: app.id, teamID: app.teamID)
                         try InjectorV3(app.url).setMetadataDetached(false)
                         withAnimation {
                             app.reload()
@@ -68,7 +68,7 @@ struct AppListCell: View {
             } else {
                 Button {
                     do {
-                        let injector = try Injector(app.url, appID: app.id, teamID: app.teamID)
+                        _ = try Injector(app.url, appID: app.id, teamID: app.teamID)
                         try InjectorV3(app.url).setMetadataDetached(true)
                         withAnimation {
                             app.reload()

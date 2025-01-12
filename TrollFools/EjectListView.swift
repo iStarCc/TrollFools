@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import ZIPFoundation
+import UniformTypeIdentifiers
 
 struct EjectListView: View {
     @StateObject var ejectList: EjectListModel
@@ -19,6 +21,9 @@ struct EjectListView: View {
 
     @State var isDeletingAll = false
     @StateObject var viewControllerHost = ViewControllerHost()
+
+    @State private var isExporting = false
+    @State private var exportURL: URL?
 
     var deleteAllButtonLabel: some View {
         HStack {
@@ -55,6 +60,7 @@ struct EjectListView: View {
                         PlugInCell(plugIn: plugin)
                             .environmentObject(ejectList)
                     } else {
+                        // let _ = NSLog("[EjectListView] 插件: \(plugin.url.path), \(ejectList.app.name)")
                         PlugInCell(plugIn: plugin)
                             .environmentObject(ejectList)
                             .padding(.vertical, 4)
@@ -95,6 +101,79 @@ struct EjectListView: View {
         }
     }
 
+    var exportButton: some View {
+        Button(action: {
+            Task {
+                await exportPlugIns()
+            }
+        }) {
+            Image(systemName: "square.and.arrow.up")
+        }
+        .disabled(ejectList.filteredPlugIns.isEmpty)
+    }
+
+    func exportPlugIns() async {
+        guard !ejectList.filteredPlugIns.isEmpty else { return }
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd_HHmmss"
+        let timestamp = dateFormatter.string(from: Date())
+        let zipFileName = "\(ejectList.app.name)_Plugins_\(timestamp)"
+        let zipFileURL = FileManager.default.temporaryDirectory.appendingPathComponent("\(zipFileName).zip")
+
+        do {
+            let fileManager = FileManager.default
+            let archive = try Archive(url: zipFileURL, accessMode: .create)
+
+            for plugin in ejectList.filteredPlugIns {
+                let entryPath = "\(zipFileName)/\(plugin.url.lastPathComponent)"
+                
+                guard fileManager.fileExists(atPath: plugin.url.path) else {
+                    NSLog("File not found: \(plugin.url.path)")
+                    continue
+                }
+                
+                try archive.addEntry(
+                    with: entryPath, 
+                    fileURL: plugin.url, 
+                    compressionMethod: .deflate
+                )
+            }
+
+            await MainActor.run {
+                shareFile(zipFileURL)
+            }
+        } catch {
+            NSLog("Export error: \(error)")
+            await MainActor.run {
+                errorMessage = error.localizedDescription
+                isErrorOccurred = true
+            }
+        }
+    }
+
+    private func shareFile(_ fileURL: URL) {
+        guard let viewController = viewControllerHost.viewController else { return }
+        
+        DispatchQueue.main.async {
+            let activityController = UIActivityViewController(activityItems: [fileURL], applicationActivities: nil)
+            
+            if #available(iOS 15.0, *) {
+                activityController.modalPresentationStyle = .pageSheet
+                if let sheet = activityController.sheetPresentationController {
+                    sheet.detents = [.medium()]
+                    sheet.prefersGrabberVisible = true
+                }
+            } else {
+                activityController.modalPresentationStyle = .formSheet
+            }
+            
+            activityController.completionWithItemsHandler = { (activityType, completed, returnedItems, error) in}
+            
+            viewController.present(activityController, animated: true)
+        }
+    }
+
     var body: some View {
         if #available(iOS 15.0, *) {
             ejectListView
@@ -110,9 +189,14 @@ struct EjectListView: View {
                 )
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled(true)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        exportButton
+                    }
+                }
         } else {
-            // Fallback on earlier versions
             ejectListView
+                .navigationBarItems(trailing: exportButton)
         }
     }
 
@@ -179,3 +263,26 @@ struct EjectListView: View {
         }
     }
 }
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    
+    func makeUIViewController(context: UIViewControllerRepresentableContext<ShareSheet>) -> UIActivityViewController {
+        let controller = UIActivityViewController(
+            activityItems: activityItems,
+            applicationActivities: nil
+        )
+        
+        if #available(iOS 15.0, *) {
+            if let sheet = controller.sheetPresentationController {
+                sheet.detents = [.medium()]
+                sheet.prefersGrabberVisible = true
+            }
+        }
+        
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ShareSheet>) {}
+}
+

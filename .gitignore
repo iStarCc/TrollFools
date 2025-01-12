@@ -1,5 +1,6 @@
 .theos
 packages
+devkit
 compile_commands.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/swift,macos,xcode
@@ -136,4 +137,3 @@ iOSInjectionProject/
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 # End of https://www.toptal.com/developers/gitignore/api/swift,macos,xcode
-n
