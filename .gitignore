@@ -2,7 +2,6 @@
 packages
 devkit
 compile_commands.json
-devkit/tipa.sh
 # Created by https://www.toptal.com/developers/gitignore/api/swift,macos,xcode
 # Edit at https://www.toptal.com/developers/gitignore?templates=swift,macos,xcode
 
@@ -136,4 +135,3 @@ iOSInjectionProject/
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 # End of https://www.toptal.com/developers/gitignore/api/swift,macos,xcode
-devkit/tipa.sh
