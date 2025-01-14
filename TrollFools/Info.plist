@@ -16,39 +16,14 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>TrollFools Deb Package</string>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>org.debian.deb-archive</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeName</key>
-			<string>TrollFools Sources File</string>
+			<string>Public Data</string>
 			<key>LSHandlerRank</key>
 			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>com.sileo.sources</string>
+				<string>public.data</string>
 			</array>
 		</dict>
-		<dict>
-			<key>CFBundleTypeName</key>
-			<string>TrollFools List File</string>
-			<key>LSHandlerRank</key>
-			<string>Default</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>com.sileo.list</string>
-			</array>
-		</dict>
-	</array>
-	<key>CFBundleIconFiles</key>
-	<array>
-		<string>AppIcon.png</string>
-		<string>AppIcon-official.png</string>
 	</array>
 </dict>
 </plist>
