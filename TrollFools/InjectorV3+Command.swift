@@ -24,7 +24,7 @@ extension InjectorV3 {
             args.append(owner)
         }
         args.append(target.path)
-        let retCode = try Execute.rootSpawn(binary: Self.chownBinaryURL.path, arguments: args)
+        let retCode = try Execute.rootSpawn(binary: Self.chownBinaryURL.path, arguments: args, ddlog: logger)
         guard case .exit(let code) = retCode, code == EXIT_SUCCESS else {
             try throwCommandFailure("chown", reason: retCode)
         }
@@ -58,7 +58,7 @@ extension InjectorV3 {
         }
         let retCode = try Execute.rootSpawn(binary: Self.cpBinaryURL.path, arguments: [
             "--reflink=auto", "-rfp", srcURL.path, destURL.path,
-        ])
+        ], ddlog: logger)
         guard case .exit(let code) = retCode, code == EXIT_SUCCESS else {
             try throwCommandFailure("cp", reason: retCode)
         }
@@ -118,7 +118,7 @@ extension InjectorV3 {
 
             receipt = try Execute.rootSpawnWithOutputs(binary: Self.ldidBinaryURL.path, arguments: [
                 "-e", target.path,
-            ])
+            ], ddlog: logger)
 
             guard case .exit(let code) = receipt.terminationReason, code == 0 else {
                 try throwCommandFailure("ldid", reason: receipt.terminationReason)
@@ -133,7 +133,7 @@ extension InjectorV3 {
 
             receipt = try Execute.rootSpawnWithOutputs(binary: Self.ldidBinaryURL.path, arguments: [
                 "-S\(xmlURL.path)", target.path,
-            ])
+            ], ddlog: logger)
 
             guard case .exit(let code) = receipt.terminationReason, code == EXIT_SUCCESS else {
                 try throwCommandFailure("ldid", reason: receipt.terminationReason)
@@ -142,7 +142,7 @@ extension InjectorV3 {
 
             let retCode = try Execute.rootSpawn(binary: Self.ldidBinaryURL.path, arguments: [
                 "-S", target.path,
-            ])
+            ], ddlog: logger)
 
             guard case .exit(let code) = retCode, code == EXIT_SUCCESS else {
                 try throwCommandFailure("ldid", reason: retCode)
@@ -160,7 +160,7 @@ extension InjectorV3 {
             args.append("-p")
         }
         args.append(target.path)
-        let retCode = try Execute.rootSpawn(binary: Self.mkdirBinaryURL.path, arguments: args)
+        let retCode = try Execute.rootSpawn(binary: Self.mkdirBinaryURL.path, arguments: args, ddlog: logger)
         guard case .exit(let code) = retCode, code == EXIT_SUCCESS else {
             try throwCommandFailure("mkdir", reason: retCode)
         }
@@ -185,7 +185,7 @@ extension InjectorV3 {
             args.append("-f")
         }
         args += [srcURL.path, destURL.path]
-        let retCode = try Execute.rootSpawn(binary: Self.mvBinaryURL.path, arguments: args)
+        let retCode = try Execute.rootSpawn(binary: Self.mvBinaryURL.path, arguments: args, ddlog: logger)
         guard case .exit(let code) = retCode, code == EXIT_SUCCESS else {
             try throwCommandFailure("mv", reason: retCode)
         }
@@ -197,8 +197,7 @@ extension InjectorV3 {
 
     public func cmdRemove(_ target: URL, recursively: Bool = false) throws {
         let retCode = try Execute.rootSpawn(binary: Self.rmBinaryURL.path, arguments: [
-            recursively ? "-rf" : "-f", target.path,
-        ])
+            recursively ? "-rf" : "-f", target.path], ddlog: logger)
         guard case .exit(let code) = retCode, code == EXIT_SUCCESS else {
             try throwCommandFailure("rm", reason: retCode)
         }
@@ -255,7 +254,7 @@ extension InjectorV3 {
             log("Command Output: \(receipt.stdout)")
             log("Standard Error: \(receipt.stderr)")
             log("Decompose Deb File \(sourceURL.lastPathComponent) done")
-//            NSLog("Decompose Deb File \(sourceURL.lastPathComponent) done")
+//            DDLogInfo("Decompose Deb File \(sourceURL.lastPathComponent) done")
             
             return receipt.stdout
         } catch {
@@ -271,8 +270,7 @@ extension InjectorV3 {
     func cmdCoreTrustBypass(_ target: URL, teamID: String) throws {
         try cmdPseudoSign(target)
         let retCode = try Execute.rootSpawn(binary: Self.ctBypassBinaryURL.path, arguments: [
-            "-r", "-i", target.path, "-t", teamID,
-        ])
+            "-r", "-i", target.path, "-t", teamID], ddlog: logger)
         guard case .exit(let code) = retCode, code == EXIT_SUCCESS else {
             try throwCommandFailure("ct_bypass", reason: retCode)
         }
@@ -311,8 +309,7 @@ extension InjectorV3 {
         }
         try cmdPseudoSign(target, force: true)
         let retCode = try Execute.rootSpawn(binary: Self.installNameToolBinaryURL.path, arguments: [
-            "-add_rpath", name, target.path,
-        ])
+            "-add_rpath", name, target.path], ddlog: logger)
         guard case .exit(let code) = retCode, code == EXIT_SUCCESS else {
             try throwCommandFailure("install_name_tool", reason: retCode)
         }
@@ -321,8 +318,7 @@ extension InjectorV3 {
     func cmdChangeLoadCommandDylib(_ target: URL, from srcName: String, to destName: String) throws {
         try cmdPseudoSign(target, force: true)
         let retCode = try Execute.rootSpawn(binary: Self.installNameToolBinaryURL.path, arguments: [
-            "-change", srcName, destName, target.path,
-        ])
+            "-change", srcName, destName, target.path], ddlog: logger)
         guard case .exit(let code) = retCode, code == EXIT_SUCCESS else {
             try throwCommandFailure("install-name-tool", reason: retCode)
         }
@@ -338,8 +334,7 @@ extension InjectorV3 {
             return
         }
         let retCode = try Execute.rootSpawn(binary: Self.optoolBinaryURL.path, arguments: [
-            "uninstall", "-p", name, "-t", target.path,
-        ])
+            "uninstall", "-p", name, "-t", target.path], ddlog: logger)
         guard case .exit(let code) = retCode, code == EXIT_SUCCESS else {
             try throwCommandFailure("optool", reason: retCode)
         }

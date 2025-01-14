@@ -4,7 +4,7 @@
 
 #import "LSApplicationProxy.h"
 #import "LSApplicationWorkspace.h"
-
+#import "StripedTextTableViewController.h"
 #import <UIKit/UIKit.h>
 
 FOUNDATION_EXTERN void TFUtilKillAll(NSString *processPath, BOOL softly);

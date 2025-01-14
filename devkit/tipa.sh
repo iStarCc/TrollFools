@@ -25,7 +25,7 @@ cd -
 
 cp -p $THEOS_STAGING_DIR/TrollFools_$VERSION-$BUILD_NUMBER.tipa packages/TrollFools_$VERSION-$BUILD_NUMBER@huamidev.tipa
 cp -p $THEOS_STAGING_DIR/TrollFools14_$VERSION-$BUILD_NUMBER.tipa packages/TrollFools14_$VERSION-$BUILD_NUMBER@huamidev.tipa
-ssh root@192.168.31.20 "trollinstall -u http://192.168.31.249:5500/packages/TrollFools_$VERSION-$BUILD_NUMBER@huamidev.tipa"
+ssh root@192.168.31.20 "trollinstall -u http://192.168.31.123:5501/packages/TrollFools_$VERSION-$BUILD_NUMBER@huamidev.tipa"
 sleep 4.5
 ssh root@192.168.31.20 "open com.huami.TrollFools"
 rm -rf packages/*.deb

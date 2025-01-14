@@ -8,6 +8,7 @@
 import SwiftUI
 import ZIPFoundation
 import UniformTypeIdentifiers
+import CocoaLumberjackSwift
 
 struct EjectListView: View {
     @StateObject var ejectList: EjectListModel
@@ -17,7 +18,7 @@ struct EjectListView: View {
     }
 
     @State var isErrorOccurred: Bool = false
-    @State var errorMessage: String = ""
+    @State var lastError: Error?
 
     @State var isDeletingAll = false
     @StateObject var viewControllerHost = ViewControllerHost()
@@ -62,7 +63,7 @@ struct EjectListView: View {
                         PlugInCell(plugIn: plugin)
                             .environmentObject(ejectList)
                     } else {
-                        // let _ = NSLog("[EjectListView] 插件: \(plugin.url.path), \(ejectList.app.name)")
+                        // let _ = DDLogInfo("[EjectListView] 插件: \(plugin.url.path), \(ejectList.app.name)")
                         PlugInCell(plugIn: plugin)
                             .environmentObject(ejectList)
                             .padding(.vertical, 4)
@@ -94,8 +95,10 @@ struct EjectListView: View {
         .animation(.easeOut, value: ejectList.filter.isSearching)
         .background(Group {
             NavigationLink(isActive: $isErrorOccurred) {
-                FailureView(title: NSLocalizedString("Error", comment: ""),
-                            message: errorMessage)
+                FailureView(
+                    title: NSLocalizedString("Error", comment: ""),
+                    error: lastError
+                )
             } label: { }
         })
         .onViewWillAppear { viewController in
@@ -131,7 +134,7 @@ struct EjectListView: View {
                 let entryPath = "\(plugin.url.lastPathComponent)"
                 
                 guard fileManager.fileExists(atPath: plugin.url.path) else {
-                    NSLog("File not found: \(plugin.url.path)")
+                    DDLogInfo("File not found: \(plugin.url.path)")
                     continue
                 }
                 
@@ -146,9 +149,9 @@ struct EjectListView: View {
                 showDocumentPicker(for: zipFileURL)
             }
         } catch {
-            NSLog("Export error: \(error)")
+            DDLogInfo("Export error: \(error)")
             await MainActor.run {
-                errorMessage = error.localizedDescription
+                lastError = error
                 isErrorOccurred = true
             }
         }
@@ -185,7 +188,6 @@ struct EjectListView: View {
                 }
         } else {
             ejectListView
-                .navigationBarItems(trailing: exportButton)
         }
     }
 
@@ -198,9 +200,8 @@ struct EjectListView: View {
             ejectList.app.reload()
             ejectList.reload()
         } catch {
-            NSLog("\(error)")
-
-            errorMessage = error.localizedDescription
+            DDLogError("\(error)", ddlog: InjectorV3.main.logger)
+            lastError = error
             isErrorOccurred = true
         }
     }
@@ -239,15 +240,14 @@ struct EjectListView: View {
                             isDeletingAll = false
                         }
 
-                        NSLog("\(error)")
-
-                        errorMessage = error.localizedDescription
+                        DDLogError("\(error)", ddlog: InjectorV3.main.logger)
+                        lastError = error
                         isErrorOccurred = true
                     }
                 }
             }
         } catch {
-            errorMessage = error.localizedDescription
+            lastError = error
             isErrorOccurred = true
         }
     }

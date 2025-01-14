@@ -5,6 +5,7 @@
 //  Created by Lakr Aream on 2021/12/6.
 //
 
+import CocoaLumberjackSwift
 import Foundation
 
 @discardableResult
@@ -76,6 +77,7 @@ public extension AuxiliaryExecute {
         workingDirectory: String? = nil,
         personaOptions: PersonaOptions? = nil,
         timeout: Double = 0,
+        ddlog: DDLog = .sharedInstance,
         setPid: ((pid_t) -> Void)? = nil,
         output: ((String) -> Void)? = nil
     )
@@ -89,6 +91,7 @@ public extension AuxiliaryExecute {
             workingDirectory: workingDirectory,
             personaOptions: personaOptions,
             timeout: timeout,
+            ddlog: ddlog,
             setPid: setPid
         ) { str in
             outputLock.lock()
@@ -119,6 +122,7 @@ public extension AuxiliaryExecute {
         workingDirectory: String? = nil,
         personaOptions: PersonaOptions? = nil,
         timeout: Double = 0,
+        ddlog: DDLog = .sharedInstance,
         setPid: ((pid_t) -> Void)? = nil,
         stdoutBlock: ((String) -> Void)? = nil,
         stderrBlock: ((String) -> Void)? = nil
@@ -132,6 +136,7 @@ public extension AuxiliaryExecute {
             workingDirectory: workingDirectory,
             personaOptions: personaOptions,
             timeout: timeout,
+            ddlog: ddlog,
             setPid: setPid,
             stdoutBlock: stdoutBlock,
             stderrBlock: stderrBlock
@@ -162,6 +167,7 @@ public extension AuxiliaryExecute {
         workingDirectory: String? = nil,
         personaOptions: PersonaOptions? = nil,
         timeout: Double = 0,
+        ddlog: DDLog = .sharedInstance,
         setPid: ((pid_t) -> Void)? = nil,
         stdoutBlock: ((String) -> Void)? = nil,
         stderrBlock: ((String) -> Void)? = nil,
@@ -258,7 +264,6 @@ public extension AuxiliaryExecute {
         defer { for case let arg? in argv { free(arg) } }
 
         // MARK: NOW POSIX_SPAWN -
-        NSLog("Execute \(command) \(args.joined(separator: " "))")
 
         var pid: pid_t = 0
         let spawnStatus = posix_spawn(&pid, command, &fileActions, &attrs, argv + [nil], realEnv + [nil])
@@ -268,6 +273,7 @@ public extension AuxiliaryExecute {
             return
         }
 
+        DDLogInfo("Spawned process \(pid) command \(args.joined(separator: " "))", ddlog: ddlog)
         setPid?(pid)
 
         close(pipestdout[1])
@@ -365,16 +371,16 @@ public extension AuxiliaryExecute {
             let terminationReason: TerminationReason
             if WIFSIGNALED(status) {
                 let signal = WTERMSIG(status)
-                NSLog("Process \(pid) terminated with uncaught signal \(signal)")
+                DDLogError("Process \(pid) terminated with uncaught signal \(signal)", ddlog: ddlog)
                 terminationReason = .uncaughtSignal(signal)
             } else {
                 assert(WIFEXITED(status))
 
                 let exitCode = WEXITSTATUS(status)
-                if exitCode == 0 {
-                    NSLog("Process \(pid) exited successfully")
+                if exitCode == EXIT_SUCCESS {
+                    DDLogInfo("Process \(pid) exited successfully", ddlog: ddlog)
                 } else {
-                    NSLog("Process \(pid) exited with code \(exitCode)")
+                    DDLogWarn("Process \(pid) exited with code \(exitCode)", ddlog: ddlog)
                 }
 
                 terminationReason = .exit(exitCode)

@@ -5,6 +5,8 @@
 //  Created by 82Flex on 2025/1/10.
 //
 
+import CocoaLumberjackSwift
+
 
 extension InjectorV3 {
 
@@ -48,11 +50,12 @@ extension InjectorV3 {
 
         let targetURLs = try collectModifiedMachOs()
         guard !targetURLs.isEmpty else {
+            DDLogError("Unable to find any modified Mach-Os", ddlog: logger)
             throw Error.generic(NSLocalizedString("No eligible framework found.", comment: ""))
         }
 
-        NSLog("modified Mach-Os \(targetURLs.map { $0.path })")
-
+        DDLogInfo("Modified Mach-Os \(targetURLs.map { $0.path })", ddlog: logger)
+        
         for assetURL in assetURLs {
             try targetURLs.forEach {
                 try removeLoadCommandOfAsset(assetURL, from: $0)

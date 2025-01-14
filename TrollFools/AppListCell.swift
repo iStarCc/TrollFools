@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CocoaLumberjackSwift
 
 struct AppListCell: View {
     @EnvironmentObject var appList: AppListModel
@@ -55,26 +56,26 @@ struct AppListCell: View {
             if app.isDetached {
                 Button {
                     do {
-                        _ = try Injector(app.url, appID: app.id, teamID: app.teamID)
+                        _ = try InjectorV3(app.url)
                         try InjectorV3(app.url).setMetadataDetached(false)
                         withAnimation {
                             app.reload()
                             appList.isRebuildNeeded = true
                         }
-                    } catch { NSLog("\(error.localizedDescription)") }
+                    } catch { DDLogError("\(error)", ddlog: InjectorV3.main.logger) }
                 } label: {
                     Label(NSLocalizedString("Unlock Version", comment: ""), systemImage: "lock.open")
                 }
             } else {
                 Button {
                     do {
-                        _ = try Injector(app.url, appID: app.id, teamID: app.teamID)
+                        _ = try InjectorV3(app.url)
                         try InjectorV3(app.url).setMetadataDetached(true)
                         withAnimation {
                             app.reload()
                             appList.isRebuildNeeded = true
                         }
-                    } catch { NSLog("\(error.localizedDescription)") }
+                    } catch { DDLogError("\(error)", ddlog: InjectorV3.main.logger) }
                 } label: {
                     Label(NSLocalizedString("Lock Version", comment: ""), systemImage: "lock")
                 }
@@ -86,7 +87,7 @@ struct AppListCell: View {
                 Label(NSLocalizedString("Clear App Cache", comment: ""), systemImage: "trash")
             }
             Button {
-                // clearAppCache()
+                useLastConfiguration()
             } label: {
                 Label(NSLocalizedString("Use Last Configuration", comment: ""), systemImage: "gear")
             }
@@ -201,6 +202,15 @@ struct AppListCell: View {
     private func openInFilza() {
         appList.openInFilza(app.url)
     }
+
+    private func useLastConfiguration() {
+        let alert = UIAlertController(title: NSLocalizedString("Coming Soon", comment: ""), message: NSLocalizedString("This feature is coming soon.", comment: ""), preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Confirm", comment: ""), style: .default, handler: nil))
+        if let topController = UIApplication.shared.keyWindow?.rootViewController {
+            topController.present(alert, animated: true, completion: nil)
+        }
+    }
+
     private func clearAppCache() {
         do {
             let injector = try InjectorV3(app.url)
@@ -211,13 +221,13 @@ struct AppListCell: View {
             ]
             
             for path in cachePaths {
-                // NSLog("[AppCache] 正在清理路径: \(path.path)")
+                // DDLogInfo("[AppCache] 正在清理路径: \(path.path)")
                 try injector.cmdRemove(path, recursively: true)
             }
             
-            // NSLog("[AppCache] 应用缓存清理完成")
+            // DDLogInfo("[AppCache] 应用缓存清理完成")
         } catch {
-            // NSLog("[AppCache] 清理缓存失败: \(error.localizedDescription)")
+            // DDLogInfo("[AppCache] 清理缓存失败: \(error.localizedDescription)")
         }
     }
 }

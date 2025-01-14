@@ -4,10 +4,11 @@
 //
 //  Created by Lessica on 2024/7/19.
 //
-
+/*    deprecation
 import MachOKit
 import SwiftUI
 import ZIPFoundation
+import CocoaLumberjackSwift
 
 final class Injector {
 
@@ -235,9 +236,9 @@ final class Injector {
             fwkURLs.append(target)
         }
 
-        NSLog("initialDylibs: \(initialDylibs)")
-        NSLog("executableURLs: \(executableURLs)")
-        NSLog("fwkURLs: \(fwkURLs)")
+        DDLogInfo("initialDylibs: \(initialDylibs)")
+        DDLogInfo("executableURLs: \(executableURLs)")
+        DDLogInfo("fwkURLs: \(fwkURLs)")
 
         return fwkURLs
     }
@@ -290,7 +291,7 @@ final class Injector {
             try throwCommandFailure("rm", reason: retCode)
         }
 
-        NSLog("rm \(target.lastPathComponent) done")
+        DDLogInfo("rm \(target.lastPathComponent) done")
     }
 
     private func _changeOwner(_ target: URL, owner: String, isDirectory: Bool) throws {
@@ -306,7 +307,7 @@ final class Injector {
             try throwCommandFailure("chown", reason: retCode)
         }
 
-        NSLog("chown \(target.lastPathComponent) done")
+        DDLogInfo("chown \(target.lastPathComponent) done")
     }
 
     private func changeOwnerToInstalld(_ target: URL, isDirectory: Bool) throws {
@@ -323,7 +324,7 @@ final class Injector {
             try throwCommandFailure("cp", reason: retCode)
         }
 
-        NSLog("cp \(src.lastPathComponent) to \(dst.lastPathComponent) done")
+        DDLogInfo("cp \(src.lastPathComponent) to \(dst.lastPathComponent) done")
     }
 
     private func moveURL(_ src: URL, to dst: URL, shouldOverride: Bool = false) throws {
@@ -344,7 +345,7 @@ final class Injector {
             try throwCommandFailure("mv", reason: retCode)
         }
 
-        NSLog("mv \(src.lastPathComponent) to \(dst.lastPathComponent) done")
+        DDLogInfo("mv \(src.lastPathComponent) to \(dst.lastPathComponent) done")
     }
 
     private func makeDirectory(_ target: URL) throws {
@@ -356,7 +357,7 @@ final class Injector {
             try throwCommandFailure("mkdir", reason: retCode)
         }
 
-        NSLog("mkdir \(target.lastPathComponent) done")
+        DDLogInfo("mkdir \(target.lastPathComponent) done")
     }
 
     @discardableResult
@@ -503,7 +504,7 @@ final class Injector {
             }
         }
 
-        NSLog("ldid \(url.lastPathComponent) done")
+        DDLogInfo("ldid \(url.lastPathComponent) done")
     }
 
     private func ctBypass(_ url: URL) throws {
@@ -517,7 +518,7 @@ final class Injector {
             try throwCommandFailure("ct_bypass", reason: retCode)
         }
 
-        NSLog("ct_bypass \(url.lastPathComponent) done")
+        DDLogInfo("ct_bypass \(url.lastPathComponent) done")
     }
 
     private func runtimePaths(_ target: URL) throws -> Set<String> {
@@ -600,7 +601,7 @@ final class Injector {
         let rpaths = try runtimePaths(target)
 
         if rpaths.contains(name) {
-            NSLog("payload \(name) already inserted")
+            DDLogInfo("payload \(name) already inserted")
             return
         }
 
@@ -613,7 +614,7 @@ final class Injector {
             try throwCommandFailure("install_name_tool", reason: retCode)
         }
 
-        NSLog("install_name_tool \(name) done")
+        DDLogInfo("install_name_tool \(name) done")
     }
 
     private func _insertLoadCommandDylib(_ target: URL, name: String, isWeak: Bool) throws {
@@ -621,7 +622,7 @@ final class Injector {
 
         let payload = "@rpath/" + name
         if dylibs.contains(payload) {
-            NSLog("payload \(name) already inserted")
+            DDLogInfo("payload \(name) already inserted")
             return
         }
 
@@ -639,7 +640,7 @@ final class Injector {
             try throwCommandFailure("insert_dylib", reason: retCode)
         }
 
-        NSLog("insert_dylib \(payload) done")
+        DDLogInfo("insert_dylib \(payload) done")
     }
 
     private func removeLoadCommand(_ target: URL, url: URL) throws {
@@ -670,7 +671,7 @@ final class Injector {
             try throwCommandFailure("optool", reason: retCode)
         }
 
-        NSLog("optool \(target.lastPathComponent) done")
+        DDLogInfo("optool \(target.lastPathComponent) done")
     }
 
     private func _applyChange(_ target: URL, from src: String, to dst: String) throws {
@@ -684,7 +685,7 @@ final class Injector {
             try throwCommandFailure("install-name-tool", reason: retCode)
         }
 
-        NSLog("install-name-tool \(target.lastPathComponent) done")
+        DDLogInfo("install-name-tool \(target.lastPathComponent) done")
     }
 
     private func findMainMachO(_ target: URL) throws -> URL {
@@ -860,7 +861,7 @@ final class Injector {
             log("Command Output: \(receipt.stdout)")
             log("Standard Error: \(receipt.stderr)")
             log("Decompose Deb File \(sourceURL.lastPathComponent) done")
-//            DDLogInfo("Decompose Deb File \(sourceURL.lastPathComponent) done")
+//            DDLogInfo(("Decompose Deb File \(sourceURL.lastPathComponent) done")
             
             return receipt.stdout
         } catch {
@@ -1020,3 +1021,4 @@ final class Injector {
 #endif
     }
 }
+*/

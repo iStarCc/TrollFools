@@ -6,13 +6,14 @@
 //
 
 import SwiftUI
+import CocoaLumberjackSwift
 
 struct AppListView: View {
     @EnvironmentObject var appList: AppListModel
     @State private var isUsingOfficialIcon = false
     @State private var isEditing = false
     @State var isErrorOccurred: Bool = false
-    @State var errorMessage: String = ""
+    @State var lastError: Error?
     @State var isFirstLaunch: Bool = false
     @State var selectorOpenedURL: URL? = nil
     
@@ -139,8 +140,10 @@ struct AppListView: View {
         .navigationBarTitleDisplayMode(appList.isSelectorMode ? .inline : .automatic)
         .background(Group {
             NavigationLink(isActive: $isErrorOccurred) {
-                FailureView(title: NSLocalizedString("Error", comment: ""),
-                            message: errorMessage)
+                FailureView(
+                    title: NSLocalizedString("Error", comment: ""),
+                    error: lastError
+                )
             } label: { }
         })
         .gesture(
@@ -341,13 +344,13 @@ struct AppListView: View {
             let contents = try fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil)
             
             for url in contents {
-                // NSLog("[SystemCache] 正在清理临时目录: \(url.path)")
+                // DDLogInfo("[SystemCache] 正在清理临时目录: \(url.path)")
                 try? fileManager.removeItem(at: url)
             }
             
-            // NSLog("[SystemCache] 系统临时缓存清理完成")
+            // DDLogInfo("[SystemCache] 系统临时缓存清理完成")
         } catch {
-            // NSLog("[SystemCache] 清理系统缓存失败: \(error.localizedDescription)")
+            // DDLogInfo("[SystemCache] 清理系统缓存失败: \(error.localizedDescription)")
         }
     }
 
@@ -409,10 +412,10 @@ struct AppListView: View {
                     }
                 }
             } catch {
-                NSLog("\(error.localizedDescription)")
-
+                DDLogError("\(error)", ddlog: InjectorV3.main.logger)
+                
                 DispatchQueue.main.async {
-                    errorMessage = error.localizedDescription
+                    lastError = error
                     isErrorOccurred = true
                 }
             }

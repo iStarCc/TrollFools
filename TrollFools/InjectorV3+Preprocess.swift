@@ -6,6 +6,7 @@
 //
 
 import ZIPFoundation
+import CocoaLumberjackSwift
 
 extension InjectorV3 {
 
@@ -17,8 +18,8 @@ extension InjectorV3 {
 
     func preprocessAssets(_ assetURLs: [URL]) throws -> [URL] {
 
-        NSLog("preprocess \(assetURLs.map { $0.path })")
-
+        DDLogVerbose("Preprocess \(assetURLs.map { $0.path })", ddlog: logger)
+        
         var preparedAssetURLs = [URL]()
         var urlsToMarkAsInjected = [URL]()
 
