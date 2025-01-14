@@ -8,7 +8,7 @@
 			<key>CFBundleTypeName</key>
 			<string>Mach-O Binary</string>
 			<key>LSHandlerRank</key>
-			<string>Default</string>
+			<string>Owner</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.apple.mach-o-binary</string>
