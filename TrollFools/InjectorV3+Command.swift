@@ -52,13 +52,16 @@ extension InjectorV3 {
         }
     }()
 
-    func cmdCopy(from srcURL: URL, to destURL: URL, overwrite: Bool = false) throws {
+    func cmdCopy(from srcURL: URL, to destURL: URL, clone: Bool = false, overwrite: Bool = false) throws {
         if overwrite {
             try? cmdRemove(destURL, recursively: true)
         }
-        let retCode = try Execute.rootSpawn(binary: Self.cpBinaryURL.path, arguments: [
-            "--reflink=auto", "-rfp", srcURL.path, destURL.path,
-        ], ddlog: logger)
+        var args = [String]()
+        if clone {
+            args.append("--reflink=auto")
+        }
+        args += ["-rfp", srcURL.path, destURL.path]
+        let retCode = try Execute.rootSpawn(binary: Self.cpBinaryURL.path, arguments: args, ddlog: logger)
         guard case .exit(let code) = retCode, code == EXIT_SUCCESS else {
             try throwCommandFailure("cp", reason: retCode)
         }
@@ -120,7 +123,7 @@ extension InjectorV3 {
                 "-e", target.path,
             ], ddlog: logger)
 
-            guard case .exit(let code) = receipt.terminationReason, code == 0 else {
+            guard case .exit(let code) = receipt.terminationReason, code == EXIT_SUCCESS else {
                 try throwCommandFailure("ldid", reason: receipt.terminationReason)
             }
 

@@ -15,7 +15,7 @@
 
 @property (nonatomic, strong) NSNumberFormatter *decimalNumberFormatter;
 @property (nonatomic, assign) NSUInteger numberOfTextRowsNotLoaded;
-
+@property (nonatomic, strong) UIBarButtonItem *shareItem;
 @property (nonatomic, strong) UIBarButtonItem *trashItem;
 @property (nonatomic, strong) UISearchController *searchController;
 
@@ -72,9 +72,20 @@
         });
     }
 
-    if (self.allowTrash) {
-        self.navigationItem.rightBarButtonItem = self.trashItem;
+
+    NSMutableArray <UIBarButtonItem *> *rightBarButtonItems = [NSMutableArray arrayWithCapacity:2];
+    if (@available(iOS 16.0, *)) {
+        if (self.allowShare) {
+            [rightBarButtonItems addObject:self.shareItem];
+        }
     }
+
+
+    if (self.allowTrash) {
+        [rightBarButtonItems addObject:self.trashItem];
+    }
+
+    self.navigationItem.rightBarButtonItems = rightBarButtonItems;
 
     if (self.allowSearch) {
         self.navigationItem.hidesSearchBarWhenScrolling = YES;
@@ -242,6 +253,18 @@
     dispatch_resume(eventSource);
 }
 
+- (void)shareItemTapped:(UIBarButtonItem *)sender {
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL fileURLWithPath:self.entryPath]] applicationActivities:nil];
+    if (@available(iOS 16.0, *)) {
+        activityViewController.popoverPresentationController.sourceItem = sender;
+    } else {
+        // Fallback on earlier versions
+        activityViewController.popoverPresentationController.barButtonItem = sender;
+        activityViewController.popoverPresentationController.sourceView = self.view;
+    }
+    [self presentViewController:activityViewController animated:YES completion:nil];
+}
+
 - (void)trashItemTapped:(UIBarButtonItem *)sender {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Confirm", @"StripedTextTableViewController") message:[NSString stringWithFormat:NSLocalizedString(@"Do you want to clear this log file “%@”?", @"StripedTextTableViewController"), [self.entryPath lastPathComponent]] preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"StripedTextTableViewController") style:UIAlertActionStyleCancel handler:^(UIAlertAction *_Nonnull action) {
@@ -397,6 +420,13 @@
 }
 
 #pragma mark - UIView Getters
+
+- (UIBarButtonItem *)shareItem {
+    if (!_shareItem) {
+        _shareItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareItemTapped:)];
+    }
+    return _shareItem;
+}
 
 - (UIBarButtonItem *)trashItem {
     if (!_trashItem) {
