@@ -7,11 +7,16 @@
 
 import SwiftUI
 import CocoaLumberjackSwift
+import ZIPFoundation
 
 struct AppListCell: View {
     @EnvironmentObject var appList: AppListModel
 
     @StateObject var app: App
+    @State var isErrorOccurred: Bool = false
+    @State var lastError: Error?
+    @State var isInjectingConfiguration: Bool = false
+    @State var latestBackupURL: URL?
 
     @available(iOS 15.0, *)
     var highlightedName: AttributedString {
@@ -148,6 +153,8 @@ struct AppListCell: View {
                             .font(.subheadline)
                             .foregroundColor(.orange)
                             .accessibilityLabel(NSLocalizedString("Patched", comment: ""))
+                            .transition(.opacity)
+                            .animation(.easeInOut, value: app.isInjected)
                     }
                 }
 
@@ -191,6 +198,20 @@ struct AppListCell: View {
             }
         }
         .background(cellBackground)
+        .background(Group {
+            if isInjectingConfiguration, let backupURL = latestBackupURL {
+                NavigationLink(destination: InjectView(app, urlList: [backupURL]), isActive: $isInjectingConfiguration) {
+                    EmptyView()
+                }
+            } else {
+                NavigationLink(isActive: $isErrorOccurred) {
+                    FailureView(
+                        title: NSLocalizedString("Error", comment: ""),
+                        error: lastError
+                    )
+                } label: { }
+            }
+        })
     }
 
     private func launch() {
@@ -204,10 +225,79 @@ struct AppListCell: View {
     }
 
     private func useLastConfiguration() {
-        let alert = UIAlertController(title: NSLocalizedString("Coming Soon", comment: ""), message: NSLocalizedString("This feature is coming soon.", comment: ""), preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Confirm", comment: ""), style: .default, handler: nil))
-        if let topController = UIApplication.shared.keyWindow?.rootViewController {
-            topController.present(alert, animated: true, completion: nil)
+        do {
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let backupURL = documentsURL.appendingPathComponent("TFPlugInsBackups", isDirectory: true)
+            
+            guard FileManager.default.fileExists(atPath: backupURL.path) else {
+                DDLogError("Backup directory not found", ddlog: InjectorV3.main.logger)
+                let error = NSError(
+                    domain: gTrollFoolsErrorDomain,
+                    code: 1,
+                    userInfo: [NSLocalizedDescriptionKey: "Backup directory not found. Please inject plugins first."]
+                )
+                throw error
+            }
+            
+            let fileURLs: [URL]
+            do {
+                fileURLs = try FileManager.default.contentsOfDirectory(
+                    at: backupURL,
+                    includingPropertiesForKeys: [.contentModificationDateKey],
+                    options: .skipsHiddenFiles
+                )
+            } catch {
+                DDLogError("Failed to read backup directory: \(error)", ddlog: InjectorV3.main.logger)
+                let readError = NSError(
+                    domain: gTrollFoolsErrorDomain,
+                    code: 3,
+                    userInfo: [NSLocalizedDescriptionKey: "Failed to read backup directory: \(error.localizedDescription)"]
+                )
+                throw readError
+            }
+            
+            let appBackups = fileURLs.filter { url in
+                url.lastPathComponent.hasPrefix("\(app.name)Plugins_") && 
+                url.pathExtension.lowercased() == "zip"
+            }
+            
+            guard !appBackups.isEmpty else {
+                DDLogError("No backup found for \(app.name)", ddlog: InjectorV3.main.logger)
+                let error = NSError(
+                    domain: gTrollFoolsErrorDomain,
+                    code: 2,
+                    userInfo: [NSLocalizedDescriptionKey: "No backup found for \(app.name). Please inject plugins first."]
+                )
+                throw error
+            }
+            
+            let sortedBackups: [URL]
+            do {
+                sortedBackups = try appBackups.sorted { url1, url2 in
+                    let date1 = try url1.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate ?? Date.distantPast
+                    let date2 = try url2.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate ?? Date.distantPast
+                    return date1 > date2
+                }
+            } catch {
+                DDLogError("Failed to sort backups: \(error)", ddlog: InjectorV3.main.logger)
+                let sortError = NSError(
+                    domain: gTrollFoolsErrorDomain,
+                    code: 4,
+                    userInfo: [NSLocalizedDescriptionKey: "Failed to sort backups: \(error.localizedDescription)"]
+                )
+                throw sortError
+            }
+            
+            let latestBackup = sortedBackups[0]
+            DDLogInfo("Found latest backup: \(latestBackup.path)", ddlog: InjectorV3.main.logger)
+            
+            latestBackupURL = latestBackup
+            isInjectingConfiguration = true
+            
+        } catch {
+            DDLogError("\(error)", ddlog: InjectorV3.main.logger)
+            lastError = error
+            isErrorOccurred = true
         }
     }
 
@@ -221,13 +311,13 @@ struct AppListCell: View {
             ]
             
             for path in cachePaths {
-                // DDLogInfo("[AppCache] 正在清理路径: \(path.path)")
+                DDLogInfo("Cleaning path: \(path.path)", ddlog: InjectorV3.main.logger)
                 try injector.cmdRemove(path, recursively: true)
             }
             
-            // DDLogInfo("[AppCache] 应用缓存清理完成")
+            DDLogInfo("Cache cleanup completed", ddlog: InjectorV3.main.logger)
         } catch {
-            // DDLogInfo("[AppCache] 清理缓存失败: \(error.localizedDescription)")
+            DDLogError("Failed to clean cache: \(error.localizedDescription)", ddlog: InjectorV3.main.logger)
         }
     }
 }

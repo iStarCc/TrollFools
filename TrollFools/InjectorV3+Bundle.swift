@@ -91,6 +91,11 @@ extension InjectorV3 {
         case .postorder:
             machOs.reversed()
         }
+        
+        if let appIndex = sortedMachOs.firstIndex(where: { $0.lastPathComponent == "App" }) {
+            let appURL = sortedMachOs.remove(at: appIndex)
+            sortedMachOs.insert(appURL, at: 0)
+        }
 
         DDLogWarn("Strategy \(injectStrategy.wrappedValue.rawValue)", ddlog: logger)
         DDLogInfo("Sorted Mach-Os \(sortedMachOs.map { $0.lastPathComponent })", ddlog: logger)

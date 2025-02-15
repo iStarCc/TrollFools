@@ -374,11 +374,9 @@ struct AppListView: View {
     }
 
     private func checkFirstLaunch() {
-        let fileManager = FileManager.default
-        let lockFilePath = getDocumentsDirectory().appendingPathComponent(".launch.lock")
-        
-        if !fileManager.fileExists(atPath: lockFilePath.path) {
-            fileManager.createFile(atPath: lockFilePath.path, contents: nil, attributes: nil)
+        let defaults = UserDefaults.standard
+        if !defaults.bool(forKey: "TFlaunch") {
+            defaults.set(true, forKey: "TFlaunch")
             isFirstLaunch = true
         } else {
             isFirstLaunch = false

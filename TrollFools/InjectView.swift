@@ -7,6 +7,7 @@
 
 import CocoaLumberjackSwift
 import SwiftUI
+import ZIPFoundation
 
 struct InjectView: View {
     @EnvironmentObject var appList: AppListModel
@@ -36,12 +37,61 @@ struct InjectView: View {
             if injector.teamID.isEmpty {
                 injector.teamID = app.teamID
             }
+            
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let backupURL = documentsURL.appendingPathComponent("TFPlugInsBackups", isDirectory: true)
+            
+            if !FileManager.default.fileExists(atPath: backupURL.path) {
+                try FileManager.default.createDirectory(at: backupURL, withIntermediateDirectories: true)
+            }
+            
+            let fileURLs = try FileManager.default.contentsOfDirectory(
+                at: backupURL,
+                includingPropertiesForKeys: nil,
+                options: .skipsHiddenFiles
+            )
+            
+            let inputZipPath = urlList.count == 1 && urlList[0].pathExtension.lowercased() == "zip" ? urlList[0].path : nil
+            
+            for url in fileURLs {
+                if url.lastPathComponent.contains(app.name) && url.pathExtension.lowercased() == "zip" {
+                    if let inputZipPath = inputZipPath, url.path == inputZipPath {
+                        continue
+                    }
+                    try? FileManager.default.removeItem(at: url)
+                }
+            }
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MMdd-HHmmss"
+            let timestamp = dateFormatter.string(from: Date())
+            let zipFileName = "\(app.name)Plugins_\(timestamp).zip"
+            let destURL = backupURL.appendingPathComponent(zipFileName)
+            
+            if urlList.count == 1 && urlList[0].pathExtension.lowercased() == "zip" {
+                try FileManager.default.copyItem(at: urlList[0], to: destURL)
+            } else {
+                let zipFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(zipFileName)
+                let archive = try Archive(url: zipFileURL, accessMode: .create)
+                
+                for plugin in InjectorV3.main.injectedAssetURLsInBundle(app.url) {
+                    let entryPath = plugin.lastPathComponent
+                    try archive.addEntry(
+                        with: entryPath,
+                        fileURL: plugin,
+                        compressionMethod: .deflate
+                    )
+                }
+                
+                try FileManager.default.moveItem(at: zipFileURL, to: destURL)
+            }
 
             try injector.inject(urlList)
+            
+            
             return .success(injector.latestLogFileURL)
 
         } catch {
-
             DDLogError("\(error)", ddlog: InjectorV3.main.logger)
 
             var userInfo: [String: Any] = [
@@ -105,6 +155,8 @@ struct InjectView: View {
                     withAnimation {
                         injectResult = result
                         app.reload()
+                        appList.performFilter()
+                        appList.objectWillChange.send()
                         viewControllerHost.viewController?.navigationController?
                             .view.isUserInteractionEnabled = true
                     }

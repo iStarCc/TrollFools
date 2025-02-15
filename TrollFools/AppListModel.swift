@@ -136,6 +136,12 @@ final class AppListModel: ObservableObject {
         }
     }
 
+    func forceRefresh() {
+        objectWillChange.send()
+        reload()
+        performFilter()
+    }
+
     private static let excludedIdentifiers: Set<String> = [
         "com.opa334.Dopamine",
         "org.coolstar.SileoStore",
