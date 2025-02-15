@@ -203,6 +203,7 @@ struct AppListCell: View {
                 NavigationLink(destination: InjectView(app, urlList: [backupURL]), isActive: $isInjectingConfiguration) {
                     EmptyView()
                 }
+                .buttonStyle(PlainButtonStyle())
             } else {
                 NavigationLink(isActive: $isErrorOccurred) {
                     FailureView(
@@ -210,6 +211,7 @@ struct AppListCell: View {
                         error: lastError
                     )
                 } label: { }
+                .buttonStyle(PlainButtonStyle())
             }
         })
     }
