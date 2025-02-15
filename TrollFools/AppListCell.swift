@@ -198,22 +198,28 @@ struct AppListCell: View {
             }
         }
         .background(cellBackground)
-        .background(Group {
-            if isInjectingConfiguration, let backupURL = latestBackupURL {
-                NavigationLink(destination: InjectView(app, urlList: [backupURL]), isActive: $isInjectingConfiguration) {
-                    EmptyView()
+        .background(
+            ZStack {
+                if isInjectingConfiguration, let backupURL = latestBackupURL {
+                    NavigationLink(destination: InjectView(app, urlList: [backupURL]), isActive: $isInjectingConfiguration) {
+                        EmptyView()
+                    }
+                    .frame(width: 0, height: 0)
+                    .hidden()
                 }
-                .buttonStyle(PlainButtonStyle())
-            } else {
-                NavigationLink(isActive: $isErrorOccurred) {
-                    FailureView(
+                
+                if isErrorOccurred {
+                    NavigationLink(destination: FailureView(
                         title: NSLocalizedString("Error", comment: ""),
                         error: lastError
-                    )
-                } label: { }
-                .buttonStyle(PlainButtonStyle())
+                    ), isActive: $isErrorOccurred) {
+                        EmptyView()
+                    }
+                    .frame(width: 0, height: 0)
+                    .hidden()
+                }
             }
-        })
+        )
     }
 
     private func launch() {
